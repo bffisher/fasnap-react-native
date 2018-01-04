@@ -5,15 +5,15 @@
  */
 
 import React, { Component } from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
-import data from './service/data';
-import Tabs from './view/tabs';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+import { createStore } from 'redux'
+import { Provider } from 'react-redux'
 
+import store from './store';
+import dataServ from './service/data';
+import Tabs from './components/tabs';
+
+import cn from './i18n/cn.lang';
 // const instructions = Platform.select({
 //   ios: 'Press Cmd+R to reload,\n' +
 //     'Cmd+D or shake for dev menu',
@@ -22,17 +22,24 @@ import Tabs from './view/tabs';
 // });
 
 export default class App extends Component<{}> {
-  componentWillMount(){
-    data.init();
+  componentWillMount() {
+    dataServ.init();
+
+    store.dispatch({
+      type: 'TEXT_LANG_CHANGE',
+      langPackage: cn
+    })
   }
 
   componentWillUnmount() {
-    data.destroy();
+    dataServ.destroy();
   }
 
   render() {
     return (
-      <Tabs></Tabs>
+      <Provider store={store}>
+        <Tabs></Tabs>
+      </Provider>
     );
   }
 }

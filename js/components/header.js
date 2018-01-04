@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import {I18nText} from './i18n';
 
 const styles = StyleSheet.create({
   container: {
@@ -12,13 +13,15 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   title: {
-    color:'#ffffff',
+    color: '#ffffff',
     fontSize: 18
   }
 });
 
-export default (props) => (
-  <View style={styles.container}>
-    <Text style={styles.title}>{props.text}</Text>
-  </View>
-);
+export default function (props) {
+  return (
+    <View style={styles.container}>
+      <I18nText style={styles.title}>{props.title}</I18nText>
+    </View>
+  )
+};

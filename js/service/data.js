@@ -32,7 +32,7 @@ class Data {
     this._realm = new Realm({ schema: [AssetItemSchema, SnapshotSchema] });
     console.log('Open realm.');
 
-    this.test();
+    // this.test();
   }
 
   destroy() {

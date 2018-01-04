@@ -1,6 +1,6 @@
 import { TabNavigator } from 'react-navigation';
 import HomeScreen from './home/home';
-import ListScreen from './list/list';
+import ListScreen from './list/index';
 import SetupScreen from './setup/setup';
 
 export default TabNavigator(
