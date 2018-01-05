@@ -9,8 +9,7 @@ var i18nDecorate = function (component, propName = 'children') {
     var content = translate(props.langPackage, props[propName]);
     if (propName === 'children') {
       return React.createElement(component, props, content);
-    }
-    else {
+    } else {
       props = Object.assign({}, props);
       props[propName] = content;
       return React.createElement(component, props, null);

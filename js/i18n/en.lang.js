@@ -7,8 +7,9 @@ export default {
     OVERVIEW:'Overview',
     NEXT: 'Next',
     PREV: 'Prev',
+    SAVE: 'Save',
+    DONE: 'Done',
     ADD_SNAPSHOT: 'Add Snapshot',
-    SAVE_SNAPSHOT: 'Save Snapshot',
     ADD_ASSET_ITEM: 'Add Asset Item'
   },
   TITLE: {

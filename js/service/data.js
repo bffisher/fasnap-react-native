@@ -57,6 +57,18 @@ class Data {
     });
   }
 
+  getSnapshot(date) {
+    var items = this._realm.objects(SNAPSHOT)
+      .filtered('date = "' + date + '"')
+      .slice(0, 1);
+
+    if (items.length > 0) {
+      return this.cloneSnapshot(items[0]);
+    }
+    return null;
+  }
+
+
   getLastSnapshot() {
     var items = this._realm.objects(SNAPSHOT)
       .sorted('date', true)
@@ -95,11 +107,11 @@ class Data {
   getSnapshotList(date, count, desc) {
     var items = this._realm.objects(SNAPSHOT);
     if (date) {
-      items = items.filtered('date < "' + date + '"');
+      items = items.filtered('date <= "' + date + '"');
     }
 
     if (desc) {
-      items.sorted('date', true);
+      items = items.sorted('date', true);
     }
 
     if (count > 0) {
@@ -110,7 +122,7 @@ class Data {
     items.forEach(element => {
       result.push(this.cloneSnapshot(element));
     });
-
+    
     return result;
   }
 
@@ -127,7 +139,7 @@ class Data {
       amount += element.amount;
     });
 
-    item.amount = amount;
+    cloneItem.amount = amount;
 
     return cloneItem;
   }

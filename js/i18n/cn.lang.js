@@ -7,8 +7,9 @@ export default {
     OVERVIEW:'概要',
     NEXT: '后一期',
     PREV: '前一期',
+    SAVE: '保存',
+    DONE: '完成',
     ADD_SNAPSHOT: '添加一个资产快照',
-    SAVE_SNAPSHOT: '保存资产快照',
     ADD_ASSET_ITEM: '添加一个资产项目'
   },
   TITLE: {

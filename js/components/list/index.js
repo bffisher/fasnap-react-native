@@ -3,15 +3,18 @@ import { StackNavigator } from 'react-navigation';
 
 import TabBarLabel from '../tabBarLabel';
 import ListScreen from './list';
-import EditScreen from './edit';
+import SnapshotEditScreen from './snapshotEdit';
+import AssetItemEditScreen from './assetItemEdit';
 
 var Stack = StackNavigator({
   List: {
     screen: ListScreen
   },
-
-  Edit: {
-    screen: EditScreen
+  SnapshotEdit: {
+    screen: SnapshotEditScreen
+  },
+  AssetItemEdit: {
+    screen: AssetItemEditScreen
   }
 });
 

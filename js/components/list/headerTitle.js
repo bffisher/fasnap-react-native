@@ -8,6 +8,5 @@ export default function (props) {
     fontSize: 18
   }, props.style);
 
-  console.log(props.style);
   return React.createElement(I18nText, props, props.children);
 };
