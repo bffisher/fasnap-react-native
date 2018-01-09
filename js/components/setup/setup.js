@@ -7,13 +7,13 @@ import TabBarLabel from '../tabBarLabel';
 export default class Setup extends Component {
   static navigationOptions = function (navigation) {
     return {
-      tabBarLabel: (<TabBarLabel title='TITLE.SETTINGS' />)
+      tabBarLabel: (<TabBarLabel title={i18n=>i18n.TITLE.SETTINGS} />)
     };
   };
 
   render() {
     return (
-      <View><Header title='TITLE.SETTINGS'></Header></View>
+      <View><Header title={i18n=>i18n.TITLE.SETTINGS}></Header></View>
     );
   }
 }

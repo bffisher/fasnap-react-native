@@ -122,7 +122,7 @@ class Data {
     items.forEach(element => {
       result.push(this.cloneSnapshot(element));
     });
-    
+
     return result;
   }
 
@@ -155,10 +155,35 @@ class Data {
     };
   }
 
-  test(){
+  getCategory(i18n, type) {
+    switch (type) {
+      case 'platform':
+        return [
+          { value: 'bank', name: i18n.CATEGORY.PLATFORM.BANK },
+          { value: 'internet', name: i18n.CATEGORY.PLATFORM.INTERNET },
+          { value: 'securities', name: i18n.CATEGORY.PLATFORM.SECURITIES },
+          { value: 'other', name: i18n.CATEGORY.PLATFORM.OTHER }
+        ];
+      case 'risk':
+        return [
+          { value: 'low', name: i18n.CATEGORY.RISK.LOW },
+          { value: 'middle', name: i18n.CATEGORY.RISK.MIDDLE },
+          { value: 'height', name: i18n.CATEGORY.RISK.HEIGHT }
+        ];
+      case 'term':
+        return [
+          { value: 'current', name: i18n.CATEGORY.TERM.CURRENT },
+          { value: 'short', name: i18n.CATEGORY.TERM.SHORT },
+          { value: 'middle', name: i18n.CATEGORY.TERM.MIDDLE },
+          { value: 'long', name: i18n.CATEGORY.TERM.LONG }
+        ];
+    }
+  }
+
+  test() {
     var snapshot = {
-      date:'2018-01-02',
-      assetItems:[]
+      date: '2018-01-02',
+      assetItems: []
     };
 
     snapshot.assetItems.push({

@@ -2,6 +2,14 @@ import { combineReducers } from 'redux';
 
 import { Util } from '../../util';
 
+var calculateAmount = function(snapshot){
+  var amount = 0;
+  snapshot.assetItems.forEach((element) => {
+    amount += element.amount;
+  });
+  snapshot.amount = amount;
+};
+
 var snapshots = function (state = [], action) {
   switch (action.type) {
     case 'LIST_SNAPSHOTS_INIT':
@@ -34,28 +42,40 @@ var snapshotEdit = function (state = {}, action) {
           date: action.date ? action.date : '',
           assetItems: []
         }
-      }
-      break;
+      };
     case 'LIST_SNAPSHOT_EDIT_MODIFY':
       return {
         isNew: false,
         snapshot: action.snapshot
-      }
-      break;
-    case 'LIST_SNAPSHOT_ASSET_ITEM_ADD':
+      };
+    case 'LIST_SNAPSHOT_ADD_ASSET_ITEM':
       state.snapshot.assetItems = [...state.snapshot.assetItems, action.assetItem];
+      calculateAmount(state.snapshot);
       return {
         isNew: state.isNew,
         snapshot: state.snapshot
-      }
-      break;
-    case 'LIST_SNAPSHOT_ASSET_ITEM_MODIFY':
+      };
+    case 'LIST_SNAPSHOT_MODIFY_ASSET_ITEM':
       state.snapshot.assetItems = state.snapshot.assetItems.map(item => (item.no === action.assetItem.no) ? action.assetItem : item);
+      calculateAmount(state.snapshot);
       return {
         isNew: state.isNew,
         snapshot: state.snapshot
-      }
-      break;
+      };
+    case 'LIST_SNAPSHOT_DELETE_ASSET_ITEM':
+      state.snapshot.assetItems = state.snapshot.assetItems.filter(item => (item.no !== action.no));
+      calculateAmount(state.snapshot);
+      return {
+        isNew: state.isNew,
+        snapshot: state.snapshot
+      };
+    case 'LIST_SNAPSHOT_IMPORT_ASSET_ITEMS':
+      state.snapshot.assetItems = action.assetItems;
+      calculateAmount(state.snapshot);
+      return {
+        isNew: state.isNew,
+        snapshot: state.snapshot
+      };
     default:
       return state;
   }
@@ -65,15 +85,22 @@ var assetItemEdit = function (state = {}, action) {
   switch (action.type) {
     case 'LIST_ASSET_ITEM_EDIT_NEW':
       return {
-        isNew: true
-      }
-      break;
+        isNew: true,
+        saveButtionStatus: false,
+        assetItem: { no: action.no }
+      };
     case 'LIST_ASSET_ITEM_EDIT_MODIFY':
       return {
         isNew: false,
+        saveButtionStatus: false,
         assetItem: action.assetItem
-      }
-      break;
+      };
+    case 'LIST_ASSET_ITEM_EDIT_CHAGE_SAVE_BUTTION_STATUS':
+      return {
+        isNew: state.isNew,
+        saveButtionStatus: action.saveButtionStatus,
+        assetItem: state.assetItem
+      };
     default:
       return state;
   }

@@ -20,7 +20,7 @@ var Stack = StackNavigator({
 
 Stack.navigationOptions = function (navigation) {
   return {
-    tabBarLabel: (<TabBarLabel title='TITLE.LIST' />)
+    tabBarLabel: (<TabBarLabel title={i18n => i18n.TITLE.LIST} />)
   };
 };
 

@@ -1,31 +1,53 @@
 import React, { Component } from 'react';
-import { View, ListView } from 'react-native';
+import { View, Button, ListView, Alert } from 'react-native';
+import { MenuProvider, Menu, MenuOptions, MenuOption, MenuTrigger, renderers } from 'react-native-popup-menu';
 import { connect } from 'react-redux'
 
-import { I18nButton } from '../i18n';
 import HeaderTitle from './headerTitle';
 import Row from './row';
 
 import { Util } from '../../util';
 import dataServ from '../../service/data';
 
+var { SlideInMenu } = renderers;
+
 class List extends Component {
+  constructor(props) {
+    super(props);
+
+    this.addBtnClicked = this.addBtnClicked.bind(this);
+    this.renderListRow = this.renderListRow.bind(this);
+    this.deleteSelectedItem = this.deleteSelectedItem.bind(this);
+  };
+
   componentWillMount() {
     this.props.iniDataSource();
   };
 
   render() {
+    var { i18n } = this.props;
     return (
-      <View>
-        <View style={{ marginVertical: 15, marginHorizontal: 15 }}>
-          <I18nButton onPress={this.addBtnClicked.bind(this)} title='BUTTON.ADD_SNAPSHOT' />
+      <MenuProvider>
+        <View>
+          <View style={{ marginVertical: 15, marginHorizontal: 15 }}>
+            <Button onPress={this.addBtnClicked} title={i18n.BUTTON.ADD_SNAPSHOT} />
+          </View>
+          <ListView
+            enableEmptySections={true}
+            dataSource={this.props.dataSource}
+            renderRow={this.renderListRow}
+          />
         </View>
-        <ListView
-          enableEmptySections={true}
-          dataSource={this.props.dataSource}
-          renderRow={this.renderListRow.bind(this)}
-        />
-      </View>
+        <Menu renderer={SlideInMenu}
+          ref={menu => this.menu = menu}
+          onSelect={value => this.onOptionSelect(value)}>
+          <MenuTrigger />
+          <MenuOptions>
+            <MenuOption value='overview' text={i18n.BUTTON.OVERVIEW} />
+            <MenuOption value='delete' text={i18n.BUTTON.DELETE} />
+          </MenuOptions>
+        </Menu>
+      </MenuProvider>
     );
   };
 
@@ -39,6 +61,20 @@ class List extends Component {
       </Row>
     );
   };
+
+  onOptionSelect(value) {
+    var { i18n } = this.props;
+
+    switch (value) {
+      case 'delete':
+        Alert.alert(i18n.TEXT.DELETE_CONFIRM, '',
+          [
+            { text: i18n.BUTTON.CANCEL },
+            { text: i18n.BUTTON.OK, onPress: this.deleteSelectedItem }
+          ]);
+        break;
+    };
+  }
 
   addBtnClicked() {
     var { navigate } = this.props.navigation;
@@ -61,6 +97,14 @@ class List extends Component {
   };
 
   itemLongPressed(snapshot) {
+    this.selectedItem = snapshot;
+    this.menu.open();
+  };
+
+  deleteSelectedItem() {
+    dataServ.deleteSnapshot(this.selectedItem.date);
+    this.props.deleteSnapshot(this.selectedItem.date);
+    this.selectedItem = null;
   };
 };
 
@@ -68,7 +112,8 @@ var listViewDataSource = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1
 var mapStateToProps = function (state) {
   return {
     snapshots: state.list.snapshots,
-    dataSource: listViewDataSource.cloneWithRows(state.list.snapshots)
+    dataSource: listViewDataSource.cloneWithRows(state.list.snapshots),
+    i18n: state.i18n
   }
 };
 
@@ -83,6 +128,9 @@ var mapDispatchToProps = function (dispatch) {
     },
     editSnapshot: function (snapshot) {
       dispatch({ type: 'LIST_SNAPSHOT_EDIT_MODIFY', snapshot })
+    },
+    deleteSnapshot: function (date) {
+      dispatch({ type: 'LIST_SNAPSHOTS_DELETE', date })
     }
   };
 };
@@ -90,7 +138,7 @@ var mapDispatchToProps = function (dispatch) {
 List = connect(mapStateToProps, mapDispatchToProps)(List);
 List.navigationOptions = function ({ navigation }) {
   return {
-    headerTitle: (<HeaderTitle style={{ paddingLeft: 15 }}>{'TITLE.LIST'}</HeaderTitle>)
+    headerTitle: (<HeaderTitle style={{ paddingLeft: 15 }} title={i18n => i18n.TITLE.LIST} />)
   };
 };
 

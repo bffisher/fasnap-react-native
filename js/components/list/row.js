@@ -7,7 +7,7 @@ export default function ({ title, value, onPress, onLongPress }) {
       <View style={{
         flexDirection: 'row',
         justifyContent:'space-between',
-        padding: 20,
+        padding: 20
       }}>
         <Text>{title}</Text>
         <Text>{value}</Text>

@@ -3,27 +3,28 @@ export default {
     CANCEL: '取消',
     OK: '确定',
     EDIT: '编辑',
-    DELETE:'删除',
-    OVERVIEW:'概要',
+    DELETE: '删除',
+    OVERVIEW: '概要',
     NEXT: '后一期',
     PREV: '前一期',
     SAVE: '保存',
     DONE: '完成',
     ADD_SNAPSHOT: '添加一个资产快照',
-    ADD_ASSET_ITEM: '添加一个资产项目'
+    ADD_ASSET_ITEM: '添加一个资产项目',
+    IMPORT_ASSET_ITEMS: '导入最近的资产项目'
   },
   TITLE: {
     HOME: '首页',
     LIST: '列表',
     SETTINGS: '设置',
     SNAPSHOT_EDIT: '资产快照编辑',
-    ASSET_ITEM_EDIT:'资产项目编辑',
+    ASSET_ITEM_EDIT: '资产项目编辑',
     TOTAL_AMOUNT: '总金额',
     OPTIONS: '选项',
-    NAME:'名称',
-    AMOUNT:'金额'
+    NAME: '名称',
+    AMOUNT: '金额'
   },
-  TEXT:{
+  TEXT: {
     DELETE_CONFIRM: '确认删除这个项目？',
     DATE_SNAPSHOT_EXIST_INFO: '{0}的资产快照已存在！',
   },

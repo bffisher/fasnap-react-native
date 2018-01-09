@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { View, Button, ListView } from 'react-native';
+import { View, Text, Button, ListView, TouchableOpacity, Alert } from 'react-native';
 import DatePicker from 'react-native-datepicker'
 import { connect } from 'react-redux'
 
-import { I18nButton } from '../i18n';
 import HeaderTitle from './headerTitle';
 import Row from './row';
 
@@ -17,13 +16,14 @@ class Edit extends Component {
   };
 
   render() {
-    var { isNew, snapshot, assetItemsDS } = this.props;
+    var { isNew, snapshot, assetItemsDS, i18n } = this.props;
 
     return (
       <View>
         <DatePicker mode='date' date={snapshot.date} format='YYYY-MM-DD' onDateChange={this.dateChanged.bind(this)} />
         <View style={{ marginVertical: 15, marginHorizontal: 15 }}>
-          <I18nButton onPress={this.addBtnClicked.bind(this)} title='BUTTON.ADD_ASSET_ITEM' />
+          <Button onPress={this.addBtnClicked.bind(this)} title={i18n.BUTTON.ADD_ASSET_ITEM} />
+          <Button disabled={snapshot.assetItems.length > 0} onPress={this.importBtnClicked.bind(this)} title={i18n.BUTTON.IMPORT_ASSET_ITEMS} />
         </View>
         <ListView
           enableEmptySections={true}
@@ -35,13 +35,25 @@ class Edit extends Component {
   };
 
   renderListRow(assetItem) {
+    var { i18n } = this.props;
     return (
-      <Row
-        title={assetItem.name}
-        value={assetItem.amount}
-        onPress={() => { this.itemPressed(assetItem) }}
-        onLongPress={() => { this.itemLongPressed(assetItem) }}>
-      </Row>
+      <TouchableOpacity onPress={() => this.itemPressed(assetItem)} >
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          padding: 20
+        }}>
+          <Text>{assetItem.name}</Text>
+          <View style={{
+            flexDirection: 'row'
+          }}>
+            <Text>{assetItem.amount}</Text>
+            <TouchableOpacity onPress={() => this.deleteBtnClicked(assetItem)} >
+              <Text style={{ paddingLeft: 5, color: 'blue' }}>{i18n.BUTTON.DELETE}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -56,8 +68,15 @@ class Edit extends Component {
 
   addBtnClicked() {
     var { navigate } = this.props.navigation;
-    this.props.newAssetItem();
+    var { assetItems } = this.props.snapshot;
+    var no = assetItems.length === 0 ? 0 : (assetItems[assetItems.length - 1].no + 1);
+    this.props.newAssetItem(no);
     navigate('AssetItemEdit');
+  };
+
+  importBtnClicked() {
+    var snapshot = this.props.snapshots[0];
+    this.props.importAssetItems(snapshot.assetItems);
   };
 
   saveBtnClicked() {
@@ -78,49 +97,77 @@ class Edit extends Component {
     navigate('AssetItemEdit');
   };
 
-  itemLongPressed(assetItem) {
+  deleteBtnClicked(assetItem) {
+    var { i18n } = this.props;
+
+    Alert.alert(i18n.TEXT.DELETE_CONFIRM, '',
+      [
+        { text: i18n.BUTTON.CANCEL },
+        { text: i18n.BUTTON.OK, onPress: () => this.deleteSelectedItem(assetItem) }
+      ]);
+  };
+
+  deleteSelectedItem(assetItem) {
+    this.props.deleteAssetItem(assetItem.no);
   };
 };
 
 var listViewDataSource = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 var mapStateToProps = function (state) {
   var { isNew, snapshot } = state.list.snapshotEdit;
+  var { snapshots } = state.list;
   return {
     isNew,
     snapshot,
-    assetItemsDS: listViewDataSource.cloneWithRows(snapshot.assetItems)
+    assetItemsDS: listViewDataSource.cloneWithRows(snapshot.assetItems),
+    snapshots,
+    i18n: state.i18n
   }
 };
 
 var mapDispatchToProps = function (dispatch) {
   return {
     changeToNew: function (date) {
-      dispatch({ type: 'LIST_SNAPSHOT_EDIT_NEW', date })
+      dispatch({ type: 'LIST_SNAPSHOT_EDIT_NEW', date });
     },
     changeToModify: function (snapshot) {
-      dispatch({ type: 'LIST_SNAPSHOT_EDIT_MODIFY', snapshot })
+      dispatch({ type: 'LIST_SNAPSHOT_EDIT_MODIFY', snapshot });
     },
-    newAssetItem: function () {
-      dispatch({ type: 'LIST_ASSET_ITEM_EDIT_NEW'})
+    importAssetItems: function (assetItems) {
+      dispatch({ type: 'LIST_SNAPSHOT_IMPORT_ASSET_ITEMS', assetItems });
+    },
+
+    newAssetItem: function (no) {
+      dispatch({ type: 'LIST_ASSET_ITEM_EDIT_NEW', no });
     },
     editAssetItem: function (assetItem) {
-      dispatch({ type: 'LIST_ASSET_ITEM_EDIT_MODIFY', assetItem })
+      dispatch({ type: 'LIST_ASSET_ITEM_EDIT_MODIFY', assetItem });
     },
+    deleteAssetItem: function (no) {
+      dispatch({ type: 'LIST_SNAPSHOT_DELETE_ASSET_ITEM', no });
+    },
+
     addSnapshotToList: function (snapshot) {
-      dispatch({ type: 'LIST_SNAPSHOTS_ADD', snapshot })
+      dispatch({ type: 'LIST_SNAPSHOTS_ADD', snapshot });
     },
     modifySnapshotToList: function (snapshot) {
-      dispatch({ type: 'LIST_SNAPSHOTS_MODIFY', snapshot })
+      dispatch({ type: 'LIST_SNAPSHOTS_MODIFY', snapshot });
     }
   };
 };
 
 Edit = connect(mapStateToProps, mapDispatchToProps)(Edit);
+
+var SaveButton = connect(function (state) {
+  var { snapshot } = state.list.snapshotEdit;
+  return { title: state.i18n.BUTTON.DONE, disabled: snapshot.assetItems.length === 0 };
+})(Button);
+
 Edit.navigationOptions = function ({ navigation }) {
   var { params = {} } = navigation.state;
   return {
-    headerTitle: (<HeaderTitle>{'TITLE.SNAPSHOT_EDIT'}</HeaderTitle>),
-    headerRight: (<I18nButton onPress={params.handleSave ? params.handleSave : () => null} title='BUTTON.SAVE' />)
+    headerTitle: (<HeaderTitle title={i18n => i18n.TITLE.SNAPSHOT_EDIT} />),
+    headerRight: (<SaveButton onPress={params.handleSave ? params.handleSave : () => null} />)
   };
 };
 

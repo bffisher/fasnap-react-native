@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import {I18nText} from './i18n';
+import { View, Text, StyleSheet } from 'react-native';
+import { connect } from 'react-redux';
 
 const styles = StyleSheet.create({
   container: {
@@ -18,10 +18,12 @@ const styles = StyleSheet.create({
   }
 });
 
-export default function (props) {
+export default connect(function (state) {
+  return { i18n: state.i18n };
+})((props) => {
   return (
     <View style={styles.container}>
-      <I18nText style={styles.title}>{props.title}</I18nText>
+      <Text style={styles.title}>{props.title(props.i18n)}</Text>
     </View>
-  )
-};
+  );
+});

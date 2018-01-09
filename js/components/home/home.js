@@ -7,7 +7,7 @@ import TabBarLabel from '../tabBarLabel';
 export default class Home extends React.Component {
   static navigationOptions = function (navigation) {
     return {
-      tabBarLabel: (<TabBarLabel title='TITLE.HOME' />)
+      tabBarLabel: (<TabBarLabel title={i18n=>i18n.TITLE.HOME} />)
     };
   };
 
@@ -15,7 +15,7 @@ export default class Home extends React.Component {
     const { navigate } = this.props.navigation;
     return (
       <View>
-        <Header title='TITLE.HOME'></Header>
+        <Header title={i18n=>i18n.TITLE.HOME}></Header>
       </View>
     );
   }

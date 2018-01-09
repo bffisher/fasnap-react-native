@@ -3,27 +3,28 @@ export default {
     CANCEL: 'Cancel',
     OK: 'OK',
     EDIT: 'Edit',
-    DELETE:'Delete',
-    OVERVIEW:'Overview',
+    DELETE: 'Delete',
+    OVERVIEW: 'Overview',
     NEXT: 'Next',
     PREV: 'Prev',
     SAVE: 'Save',
     DONE: 'Done',
     ADD_SNAPSHOT: 'Add Snapshot',
-    ADD_ASSET_ITEM: 'Add Asset Item'
+    ADD_ASSET_ITEM: 'Add Asset Item',
+    IMPORT_ASSET_ITEMS: 'Import Asset Items'
   },
   TITLE: {
     HOME: 'Home',
     LIST: 'List',
     SETTINGS: 'Settings',
     SNAPSHOT_EDIT: 'Edit Snapshot',
-    ASSET_ITEM_EDIT:'Edit Asset Item',
+    ASSET_ITEM_EDIT: 'Edit Asset Item',
     TOTAL_AMOUNT: 'Total Amount',
     OPTIONS: 'Options',
-    NAME:'Name',
-    AMOUNT:'Amount'
+    NAME: 'Name',
+    AMOUNT: 'Amount'
   },
-  TEXT:{
+  TEXT: {
     DELETE_CONFIRM: 'Do you want to delete the item？',
     DATE_SNAPSHOT_EXIST_INFO: 'Snapshot of {0} already exist!',
   },

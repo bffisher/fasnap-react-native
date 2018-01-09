@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { I18nText } from './i18n';
+import { View, Text, StyleSheet } from 'react-native';
+import { connect } from 'react-redux';
 
-export default function (props) {
+export default connect(function (state) {
+  return { i18n: state.i18n };
+})((props) => {
   return (
-    <I18nText style={{ color: '#ffffff', fontSize: 17 }}>{props.title}</I18nText>
-  )
-};
+    <Text style={{ color: '#ffffff', fontSize: 17 }}>{props.title(props.i18n)}</Text>
+  );
+});
