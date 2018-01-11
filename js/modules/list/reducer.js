@@ -1,8 +1,11 @@
 import { combineReducers } from 'redux';
 
+import { PAGES } from '../../constants/actionTypes';
 import { Util } from '../../util';
 
-var calculateAmount = function(snapshot){
+var { SNAPSHOTS, SNAPSHOT_EDIT, ASSET_ITEM_EDIT } = PAGES.LIST;
+
+var calculateAmount = function (snapshot) {
   var amount = 0;
   snapshot.assetItems.forEach((element) => {
     amount += element.amount;
@@ -12,9 +15,9 @@ var calculateAmount = function(snapshot){
 
 var snapshots = function (state = [], action) {
   switch (action.type) {
-    case 'LIST_SNAPSHOTS_INIT':
+    case SNAPSHOTS.RESET:
       return action.snapshots;
-    case 'LIST_SNAPSHOTS_ADD':
+    case SNAPSHOTS.ADD:
       let result = [], len = state.length, inserted = false;
       for (let i = 0; i < len; i++) {
         if (!inserted && action.snapshot.date >= state[i].date) {
@@ -24,9 +27,9 @@ var snapshots = function (state = [], action) {
         result.push(state[i]);
       }
       return result;
-    case 'LIST_SNAPSHOTS_DELETE':
+    case SNAPSHOTS.DELETE_OK:
       return state.filter(snapshot => (snapshot.date !== action.date));
-    case 'LIST_SNAPSHOTS_MODIFY':
+    case SNAPSHOTS.MODIFY:
       return state.map(snapshot => (snapshot.date === action.snapshot.date) ? action.snapshot : snapshot);
     default:
       return state;
@@ -35,7 +38,7 @@ var snapshots = function (state = [], action) {
 
 var snapshotEdit = function (state = {}, action) {
   switch (action.type) {
-    case 'LIST_SNAPSHOT_EDIT_NEW':
+    case SNAPSHOT_EDIT.NEW:
       return {
         isNew: true,
         snapshot: {
@@ -43,33 +46,36 @@ var snapshotEdit = function (state = {}, action) {
           assetItems: []
         }
       };
-    case 'LIST_SNAPSHOT_EDIT_MODIFY':
+    case SNAPSHOT_EDIT.MODIFY:
       return {
         isNew: false,
         snapshot: action.snapshot
       };
-    case 'LIST_SNAPSHOT_ADD_ASSET_ITEM':
+    case SNAPSHOT_EDIT.ADD_ASSET_ITEM:
       state.snapshot.assetItems = [...state.snapshot.assetItems, action.assetItem];
-      calculateAmount(state.snapshot);
+      state.snapshot.assetItems.forEach((element) => {
+        element.amount = 0;
+      });
+      state.snapshot.amount = 0;
       return {
         isNew: state.isNew,
         snapshot: state.snapshot
       };
-    case 'LIST_SNAPSHOT_MODIFY_ASSET_ITEM':
+    case SNAPSHOT_EDIT.MODIFY_ASSET_ITEM:
       state.snapshot.assetItems = state.snapshot.assetItems.map(item => (item.no === action.assetItem.no) ? action.assetItem : item);
       calculateAmount(state.snapshot);
       return {
         isNew: state.isNew,
         snapshot: state.snapshot
       };
-    case 'LIST_SNAPSHOT_DELETE_ASSET_ITEM':
+    case SNAPSHOT_EDIT.DELETE_ASSET_ITEM:
       state.snapshot.assetItems = state.snapshot.assetItems.filter(item => (item.no !== action.no));
       calculateAmount(state.snapshot);
       return {
         isNew: state.isNew,
         snapshot: state.snapshot
       };
-    case 'LIST_SNAPSHOT_IMPORT_ASSET_ITEMS':
+    case SNAPSHOT_EDIT.IMPORT_ASSET_ITEMS:
       state.snapshot.assetItems = action.assetItems;
       calculateAmount(state.snapshot);
       return {
@@ -83,19 +89,19 @@ var snapshotEdit = function (state = {}, action) {
 
 var assetItemEdit = function (state = {}, action) {
   switch (action.type) {
-    case 'LIST_ASSET_ITEM_EDIT_NEW':
+    case ASSET_ITEM_EDIT.NEW:
       return {
         isNew: true,
         saveButtionStatus: false,
         assetItem: { no: action.no }
       };
-    case 'LIST_ASSET_ITEM_EDIT_MODIFY':
+    case ASSET_ITEM_EDIT.MODIFY:
       return {
         isNew: false,
         saveButtionStatus: false,
         assetItem: action.assetItem
       };
-    case 'LIST_ASSET_ITEM_EDIT_CHAGE_SAVE_BUTTION_STATUS':
+    case ASSET_ITEM_EDIT.CHANGE_SAVE_BUTTION_STATUS:
       return {
         isNew: state.isNew,
         saveButtionStatus: action.saveButtionStatus,

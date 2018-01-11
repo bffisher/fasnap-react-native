@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { StackNavigator } from 'react-navigation';
 
 import TabBarLabel from '../tabBarLabel';
-import ListScreen from './list';
-import SnapshotEditScreen from './snapshotEdit';
-import AssetItemEditScreen from './assetItemEdit';
+import ListScreen from './pages/list';
+import SnapshotEditScreen from './pages/snapshotEdit';
+import AssetItemEditScreen from './pages/assetItemEdit';
 
 var Stack = StackNavigator({
   List: {

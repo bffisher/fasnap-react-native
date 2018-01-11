@@ -3,11 +3,12 @@ import { View, Text, Button, ListView, TouchableOpacity, Alert } from 'react-nat
 import DatePicker from 'react-native-datepicker'
 import { connect } from 'react-redux'
 
-import HeaderTitle from './headerTitle';
-import Row from './row';
+import select from '../select';
+import HeaderTitle from '../components/headerTitle';
+import Row from '../components/row';
 
-import { Util } from '../../util';
-import dataServ from '../../service/data';
+import { PAGES } from '../../../constants/actionTypes';
+import { Util } from '../../../util';
 
 class Edit extends Component {
   componentDidMount() {
@@ -20,10 +21,10 @@ class Edit extends Component {
 
     return (
       <View>
-        <DatePicker mode='date' date={snapshot.date} format='YYYY-MM-DD' onDateChange={this.dateChanged.bind(this)} />
+        <DatePicker mode='date' date={snapshot.date} format='YYYY-MM-DD' onDateChange={(date) => this.props.dateChanged(date)} />
         <View style={{ marginVertical: 15, marginHorizontal: 15 }}>
           <Button onPress={this.addBtnClicked.bind(this)} title={i18n.BUTTON.ADD_ASSET_ITEM} />
-          <Button disabled={snapshot.assetItems.length > 0} onPress={this.importBtnClicked.bind(this)} title={i18n.BUTTON.IMPORT_ASSET_ITEMS} />
+          <Button disabled={!isNew || snapshot.assetItems.length > 0} onPress={this.importBtnClicked.bind(this)} title={i18n.BUTTON.IMPORT_ASSET_ITEMS} />
         </View>
         <ListView
           enableEmptySections={true}
@@ -57,15 +58,6 @@ class Edit extends Component {
     );
   };
 
-  dateChanged(date) {
-    var existSnapshot = dataServ.getSnapshot(date);
-    if (existSnapshot) {
-      this.props.changeToModify(existSnapshot);
-    } else {
-      this.props.changeToNew(date);
-    }
-  };
-
   addBtnClicked() {
     var { navigate } = this.props.navigation;
     var { assetItems } = this.props.snapshot;
@@ -75,19 +67,12 @@ class Edit extends Component {
   };
 
   importBtnClicked() {
-    var snapshot = this.props.snapshots[0];
-    this.props.importAssetItems(snapshot.assetItems);
+    this.props.importAssetItemsOfLast();
   };
 
   saveBtnClicked() {
     var { goBack } = this.props.navigation;
-
-    dataServ.saveSnapshot(this.props.snapshot);
-    if (this.props.isNew) {
-      this.props.addSnapshotToList(this.props.snapshot);
-    } else {
-      this.props.modifySnapshotToList(this.props.snapshot);
-    }
+    this.props.saveSnapshot(this.props.isNew, this.props.snapshot);
     goBack();
   };
 
@@ -114,44 +99,39 @@ class Edit extends Component {
 
 var listViewDataSource = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 var mapStateToProps = function (state) {
-  var { isNew, snapshot } = state.list.snapshotEdit;
-  var { snapshots } = state.list;
+  var { snapshotEdit } = select(state);
+  var { isNew, snapshot } = snapshotEdit;
+
   return {
     isNew,
     snapshot,
     assetItemsDS: listViewDataSource.cloneWithRows(snapshot.assetItems),
-    snapshots,
     i18n: state.i18n
   }
 };
 
 var mapDispatchToProps = function (dispatch) {
+  var { SNAPSHOTS, SNAPSHOT_EDIT, ASSET_ITEM_EDIT } = PAGES.LIST;
   return {
-    changeToNew: function (date) {
-      dispatch({ type: 'LIST_SNAPSHOT_EDIT_NEW', date });
+    dateChanged: function (date) {
+      dispatch({ type: SNAPSHOT_EDIT.CHANGE_DATE, date });
     },
-    changeToModify: function (snapshot) {
-      dispatch({ type: 'LIST_SNAPSHOT_EDIT_MODIFY', snapshot });
-    },
-    importAssetItems: function (assetItems) {
-      dispatch({ type: 'LIST_SNAPSHOT_IMPORT_ASSET_ITEMS', assetItems });
+    importAssetItemsOfLast: function () {
+      dispatch({ type: SNAPSHOT_EDIT.IMPORT_ASSET_ITEMS_OF_LAST });
     },
 
     newAssetItem: function (no) {
-      dispatch({ type: 'LIST_ASSET_ITEM_EDIT_NEW', no });
+      dispatch({ type: ASSET_ITEM_EDIT.NEW, no });
     },
     editAssetItem: function (assetItem) {
-      dispatch({ type: 'LIST_ASSET_ITEM_EDIT_MODIFY', assetItem });
+      dispatch({ type: ASSET_ITEM_EDIT.MODIFY, assetItem });
     },
     deleteAssetItem: function (no) {
-      dispatch({ type: 'LIST_SNAPSHOT_DELETE_ASSET_ITEM', no });
+      dispatch({ type: SNAPSHOT_EDIT.DELETE_ASSET_ITEM, no });
     },
 
-    addSnapshotToList: function (snapshot) {
-      dispatch({ type: 'LIST_SNAPSHOTS_ADD', snapshot });
-    },
-    modifySnapshotToList: function (snapshot) {
-      dispatch({ type: 'LIST_SNAPSHOTS_MODIFY', snapshot });
+    saveSnapshot: function (isNew, snapshot) {
+      dispatch({ type: SNAPSHOT_EDIT.SAVE, isNew, snapshot });
     }
   };
 };
@@ -159,7 +139,7 @@ var mapDispatchToProps = function (dispatch) {
 Edit = connect(mapStateToProps, mapDispatchToProps)(Edit);
 
 var SaveButton = connect(function (state) {
-  var { snapshot } = state.list.snapshotEdit;
+  var { snapshot } = select(state).snapshotEdit;
   return { title: state.i18n.BUTTON.DONE, disabled: snapshot.assetItems.length === 0 };
 })(Button);
 

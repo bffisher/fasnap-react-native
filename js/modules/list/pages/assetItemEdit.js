@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { View, Button, TextInput, Picker } from 'react-native';
+import { View, Button, TextInput } from 'react-native';
 import { connect } from 'react-redux'
 
-import HeaderTitle from './headerTitle';
-import Row from './row';
-import Selector from './selector';
+import select from '../select';
+import HeaderTitle from '../components/headerTitle';
+import Picker from '../components/picker';
 
-import dataServ from '../../service/data';
-
-import { Util } from '../../util';
+import { PAGES } from '../../../constants/actionTypes';
+import dataServ from '../../../service/data';
+import { Util } from '../../../util';
 
 class MyInputText extends Component {
   constructor(props) {
@@ -60,7 +60,6 @@ class Edit extends Component {
 
   render() {
     var { isNew, assetItem, i18n } = this.props;
-    console.log('render', assetItem);
 
     return (
       <View>
@@ -69,11 +68,11 @@ class Edit extends Component {
         <MyInputText onChangeText={(text) => this.handleValueChange('amount', text)}
           initText={assetItem.amount === 0 ? '' : '' + assetItem.amount}
           placeholder={i18n.TITLE.AMOUNT} keyboardType='numeric' />
-        <Selector onValueChange={(value) => this.handleValueChange('platform', value)}
+        <Picker onValueChange={(value) => this.handleValueChange('platform', value)}
           title={i18n.CATEGORY.NAME.PLATFORM} value={assetItem.platform} candidateItems={this.platforms} />
-        <Selector onValueChange={(value) => this.handleValueChange('risk', value)}
+        <Picker onValueChange={(value) => this.handleValueChange('risk', value)}
           title={i18n.CATEGORY.NAME.RISK} value={assetItem.risk} candidateItems={this.risks} />
-        <Selector onValueChange={(value) => this.handleValueChange('term', value)}
+        <Picker onValueChange={(value) => this.handleValueChange('term', value)}
           title={i18n.CATEGORY.NAME.TERM} value={assetItem.term} candidateItems={this.terms} />
       </View>
     );
@@ -117,26 +116,27 @@ class Edit extends Component {
 };
 
 var mapStateToProps = function (state) {
-  var { isNew, assetItem } = state.list.assetItemEdit;
+  var { isNew, assetItem } = select(state).assetItemEdit;
   return { isNew, assetItem, i18n: state.i18n };
 };
 
 var mapDispatchToProps = function (dispatch) {
+  var { SNAPSHOT_EDIT, ASSET_ITEM_EDIT } = PAGES.LIST;
   return {
     changeToNew: function () {
-      dispatch({ type: 'LIST_ASSET_ITEM_EDIT_NEW' })
+      dispatch({ type: ASSET_ITEM_EDIT.NEW })
     },
     changeToModify: function (assetItem) {
-      dispatch({ type: 'LIST_ASSET_ITEM_EDIT_MODIFY', assetItem })
+      dispatch({ type: ASSET_ITEM_EDIT.MODIFY, assetItem })
     },
     addAssetItemToSnapshot: function (assetItem) {
-      dispatch({ type: 'LIST_SNAPSHOT_ADD_ASSET_ITEM', assetItem })
+      dispatch({ type: SNAPSHOT_EDIT.ADD_ASSET_ITEM, assetItem })
     },
     modifyAssetItemToSnapshot: function (assetItem) {
-      dispatch({ type: 'LIST_SNAPSHOT_MODIFY_ASSET_ITEM', assetItem })
+      dispatch({ type: SNAPSHOT_EDIT.MODIFY_ASSET_ITEM, assetItem })
     },
     changeSaveButtionStatus: function (saveButtionStatus) {
-      dispatch({ type: 'LIST_ASSET_ITEM_EDIT_CHAGE_SAVE_BUTTION_STATUS', saveButtionStatus })
+      dispatch({ type: ASSET_ITEM_EDIT.CHANGE_SAVE_BUTTION_STATUS, saveButtionStatus })
     }
   };
 };
@@ -144,7 +144,7 @@ var mapDispatchToProps = function (dispatch) {
 Edit = connect(mapStateToProps, mapDispatchToProps)(Edit);
 
 var SaveButton = connect(function (state) {
-  return { title: state.i18n.BUTTON.DONE, disabled: !state.list.assetItemEdit.saveButtionStatus };
+  return { title: state.i18n.BUTTON.DONE, disabled: !select(state).assetItemEdit.saveButtionStatus };
 })(Button);
 
 Edit.navigationOptions = function ({ navigation }) {

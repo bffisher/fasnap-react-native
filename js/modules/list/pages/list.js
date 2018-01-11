@@ -3,11 +3,12 @@ import { View, Button, ListView, Alert } from 'react-native';
 import { MenuProvider, Menu, MenuOptions, MenuOption, MenuTrigger, renderers } from 'react-native-popup-menu';
 import { connect } from 'react-redux'
 
-import HeaderTitle from './headerTitle';
-import Row from './row';
+import select from '../select';
+import HeaderTitle from '../components/headerTitle';
+import Row from '../components/row';
 
-import { Util } from '../../util';
-import dataServ from '../../service/data';
+import { PAGES } from '../../../constants/actionTypes';
+import { Util } from '../../../util';
 
 var { SlideInMenu } = renderers;
 
@@ -102,7 +103,6 @@ class List extends Component {
   };
 
   deleteSelectedItem() {
-    dataServ.deleteSnapshot(this.selectedItem.date);
     this.props.deleteSnapshot(this.selectedItem.date);
     this.selectedItem = null;
   };
@@ -110,27 +110,28 @@ class List extends Component {
 
 var listViewDataSource = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 var mapStateToProps = function (state) {
+  var { snapshots } = select(state);
   return {
-    snapshots: state.list.snapshots,
-    dataSource: listViewDataSource.cloneWithRows(state.list.snapshots),
+    snapshots: snapshots,
+    dataSource: listViewDataSource.cloneWithRows(snapshots),
     i18n: state.i18n
   }
 };
 
 var mapDispatchToProps = function (dispatch) {
+  var { SNAPSHOTS, SNAPSHOT_EDIT } = PAGES.LIST;
   return {
     iniDataSource: function () {
-      var snapshots = dataServ.getSnapshotList(null, null, true);
-      dispatch({ type: 'LIST_SNAPSHOTS_INIT', snapshots })
+      dispatch({ type: SNAPSHOTS.INIT })
     },
     newSnapshot: function (date) {
-      dispatch({ type: 'LIST_SNAPSHOT_EDIT_NEW', date })
+      dispatch({ type: SNAPSHOT_EDIT.NEW, date })
     },
     editSnapshot: function (snapshot) {
-      dispatch({ type: 'LIST_SNAPSHOT_EDIT_MODIFY', snapshot })
+      dispatch({ type: SNAPSHOT_EDIT.MODIFY, snapshot })
     },
     deleteSnapshot: function (date) {
-      dispatch({ type: 'LIST_SNAPSHOTS_DELETE', date })
+      dispatch({ type: SNAPSHOTS.DELETE, date })
     }
   };
 };
